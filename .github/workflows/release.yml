@@ -1,0 +1,40 @@
+name: Build and Release
+
+on:
+  release:
+    types:
+      - created
+
+jobs:
+  build:
+    name: Build and Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.20
+
+      - name: Build for Linux
+        run: GOOS=linux GOARCH=amd64 go build -o calendarapi-linux
+
+      - name: Build for Windows
+        run: GOOS=windows GOARCH=amd64 go build -o calendarapi-windows.exe
+
+      - name: Build for macOS
+        run: GOOS=darwin GOARCH=amd4 go build -o calendarapi-macos
+
+      - name: Create Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            calendarapi-linux
+            calendarapi-windows.exe
+            calendarapi-macos
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
